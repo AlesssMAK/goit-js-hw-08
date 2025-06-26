@@ -67,38 +67,41 @@ const images = [
     
 const gallery = document.querySelector(".gallery");
 
-const galleryEl = images.map((item) => {
-    const listEl = document.createElement("li");
-    listEl.classList.add("gallery-item");
+gallery.insertAdjacentHTML("beforeend", createGallery(images));
 
-    const linkEl = document.createElement("a");
-    linkEl.classList.add("gallery-link");
-    linkEl.href = item.original;
-        
-    const imageEl = document.createElement("img");
-    imageEl.classList.add("gallery-image");
-    imageEl.src = item.preview;
-    imageEl.setAttribute("data-source", item.original)
-    imageEl.alt = item.description;
+function createGallery(arr) {
+    return arr
+        .map(({ preview, original, description }) => `
+            <li class="gallery-item">
+            <a class="gallery-link" href="${original}">
+              <img
+                class="gallery-image"
+                src="${preview}"
+                data-source="${original}"
+                alt="${description}"
+              />
+            </a>
+          </li>`
+        ).join("");
+}
 
-    linkEl.append(imageEl);
-    listEl.append(linkEl);
-    
-    return listEl;
-    
-});
-
-gallery.append(...galleryEl);
 
 gallery.addEventListener("click", (event) => {
 
-    const clickedImg = event.target;
 
-    console.log(clickedImg);
     
-    if (clickedImg.nodeName !== "IMG") return;
+    if (event.target.nodeName !== "IMG") return;
     
     event.preventDefault();
-});
 
-console.log(gallery);
+    if (event.target.dataset.source) {
+      const instance = basicLightbox.create(`
+        <div class="modal">
+            <img src="${event.target.dataset.source}" alt="${event.target.alt}" width="1112" height="640"/>
+        </div>
+    `)
+    
+    instance.show()
+        
+    }
+});
